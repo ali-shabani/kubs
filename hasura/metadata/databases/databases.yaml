@@ -1,0 +1,10 @@
+- name: buynow
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url:
+        from_env: BUYNOW_DATABASE_URL
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include buynow/tables/tables.yaml"
+  functions: "!include buynow/functions/functions.yaml"

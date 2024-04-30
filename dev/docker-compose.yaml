@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16.2
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    volumes:
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - db_data:/var/lib/postgresql/data
+
+  graphql-engine:
+    image: hasura/graphql-engine:v2.38.1
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "postgres"
+    restart: always
+    environment:
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
+      BUYNOW_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/buynow
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS: true
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
+
+volumes:
+  db_data:

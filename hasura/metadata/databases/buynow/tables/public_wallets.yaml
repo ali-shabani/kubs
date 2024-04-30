@@ -1,0 +1,19 @@
+table:
+  name: wallets
+  schema: public
+object_relationships:
+  - name: user_wallet
+    using:
+      foreign_key_constraint_on:
+        column: wallet_id
+        table:
+          name: user_wallets
+          schema: public
+array_relationships:
+  - name: wallet_transactions
+    using:
+      foreign_key_constraint_on:
+        column: wallet_id
+        table:
+          name: wallet_transactions
+          schema: public

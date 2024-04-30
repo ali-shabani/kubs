@@ -1,0 +1,6 @@
+CREATE TABLE "wallets" (
+    "id" UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
+    "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "balance" INTEGER NOT NULL DEFAULT 0,
+    "min" INTEGER NOT NULL DEFAULT 0
+);

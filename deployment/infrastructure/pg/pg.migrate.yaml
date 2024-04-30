@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+spec:
+  template:
+    spec:
+      containers:
+        - name: db-migration
+          image: pyramidalish/db-migrate
+          args:
+            - "migrate"
+            - "apply"
+            - "--url"
+            - "postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/buynow?sslmode=disable"
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
+      restartPolicy: OnFailure
