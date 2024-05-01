@@ -5,27 +5,71 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      HASURA_DB: $HASURA_DB
+      BUYNOW_DB: $BUYNOW_DB
     volumes:
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  graphql-engine:
+  db-migrate:
+    image: arigaio/atlas:latest
+    depends_on:
+      - "postgres"
+    volumes:
+      - ../db/migrations:/migrations
+    command:
+      ["migrate", "apply", "--url", "$BUYNOW_DATABASE_URL?sslmode=disable"]
+
+  hasura:
     image: hasura/graphql-engine:v2.38.1
     ports:
       - "8080:8080"
     depends_on:
       - "postgres"
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
     environment:
-      HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
-      BUYNOW_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/buynow
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: $HASURA_GRAPHQL_METADATA_DATABASE_URL
+      BUYNOW_DATABASE_URL: $BUYNOW_DATABASE_URL
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: $HASURA_GRAPHQL_ADMIN_SECRET
       HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS: true
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
 
+  hasura-cli:
+    build:
+      context: ..
+      dockerfile: dev/hasura-cli/Dockerfile
+    image: buynow/hasura-cli
+    depends_on:
+      hasura:
+        condition: service_healthy
+    command:
+      [
+        "metadata",
+        "apply",
+        "--endpoint",
+        "http://hasura:8080",
+        "--admin-secret",
+        "$HASURA_GRAPHQL_ADMIN_SECRET",
+        "--project",
+        "hasura",
+      ]
+    volumes:
+      - ../hasura:/hasura
+
 volumes:
-  db_data:
+  postgres_data:

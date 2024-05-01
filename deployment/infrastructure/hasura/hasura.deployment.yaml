@@ -25,7 +25,7 @@ spec:
             ]
       containers:
         - name: hasura
-          image: hasura/graphql-engine:v2.34.0
+          image: hasura/graphql-engine:v2.38.1
           env:
             - name: HASURA_GRAPHQL_METADATA_DATABASE_URL
               valueFrom:
@@ -52,3 +52,15 @@ spec:
             limits:
               cpu: "250m"
               memory: "500Mi"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http

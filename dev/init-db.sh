@@ -2,6 +2,6 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE DATABASE hasura;
-    CREATE DATABASE buynow;
+    CREATE DATABASE $HASURA_DB;
+    CREATE DATABASE $BUYNOW_DB;
 EOSQL
