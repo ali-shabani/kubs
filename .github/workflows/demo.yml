@@ -5,14 +5,7 @@ jobs:
     name: deploy to cluster
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: deploy to cluster
-        uses: azure/setup-kubectl@v3
-        with:
-          version: ${{ env.ARVAN_KUBE_VERSION }}
-
-      - name: Apply kubeconfig
-        run: echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | kubectl apply -f -
-
-      - name: Kubectl version
-        run: kubectl version
+      - name: test secrets and env
+        run: |
+          echo "kube version env: ${{ env.ARVAN_KUBE_VERSION }}"
+          echo "kube version secrets: ${{ secrets.ARVAN_KUBE_VERSION }}"
