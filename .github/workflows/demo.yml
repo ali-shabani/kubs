@@ -12,7 +12,7 @@ jobs:
           version: v1.25.6
 
       - name: Apply kubeconfig
-        run: echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode | kubectl apply -f -
+        run: echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode --decode > ~/.kube/config
 
       - name: Kubectl version
         run: kubectl version
