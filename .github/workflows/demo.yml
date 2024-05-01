@@ -1,6 +1,40 @@
 name: deploy
 on: push
+
 jobs:
+  build_image:
+    name: build migate image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: ghcr.io/buynow/db-migrate
+          # generate Docker tags based on the following events/attributes
+          tags: type=sha
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./db
+          file: ./db/Dockerfile
+          push: true
+          tags: buynow/db-migrate:${{ github.run_number }}
+          cache-from: type=registry,ref=buynow/db-migrate:latest
+          cache-to: type=inline
   deploy:
     name: deploy to cluster
     runs-on: ubuntu-latest
