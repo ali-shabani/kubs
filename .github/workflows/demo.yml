@@ -7,8 +7,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: deploy to cluster
-        uses: steebchen/kubectl@v2.0.0
-        with: # defaults to latest kubectl binary version
-          config: ${{ secrets.ARVAN_KUBE_CONFIG }}
+        uses: azure/setup-kubectl@v3
+        with:
           version: ${{ env.ARVAN_KUBE_VERSION }}
-          command: version
+
+      - name: Apply kubeconfig
+        run: echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | kubectl apply -f -
+
+      - name: Kubectl version
+        run: kubectl version
