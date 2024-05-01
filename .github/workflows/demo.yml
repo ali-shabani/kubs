@@ -9,7 +9,7 @@ jobs:
       - name: deploy to cluster
         uses: azure/setup-kubectl@v3
         with:
-          version: ${{ secrets.ARVAN_KUBE_VERSION }}
+          version: v1.25.6
 
       - name: Apply kubeconfig
         run: echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | kubectl apply -f -
