@@ -16,13 +16,14 @@ spec:
     spec:
       initContainers:
         - name: check-postgres
-          image: busybox:1.28
+          image: postgres:16.2
           command:
             [
               "sh",
               "-c",
-              "until nslookup postgres; do echo waiting for postgres; sleep 2; done;",
+              "until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;",
             ]
+
       containers:
         - name: hasura
           image: hasura/graphql-engine:v2.38.1

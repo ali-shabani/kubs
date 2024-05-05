@@ -5,9 +5,19 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - name: check-postgres
+          image: postgres:16.2
+          command:
+            [
+              "sh",
+              "-c",
+              "until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;",
+            ]
+
       containers:
         - name: db-migration
-          image: pyramidalish/db-migrate
+          image: ${MIGRATE_IMAGE_NAME}
           args:
             - "migrate"
             - "apply"

@@ -3,7 +3,7 @@ on: push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/db-migrate
+  MIGRATE_IMAGE_NAME: ${{ github.repository }}/db-migrate
 
 jobs:
   build_image:
@@ -28,9 +28,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=raw,value=${{ github.run_number }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -42,17 +43,49 @@ jobs:
   deploy:
     name: deploy to cluster
     runs-on: ubuntu-latest
+    needs: build_image
     steps:
       - uses: actions/checkout@v4
       - name: deploy to cluster
         uses: azure/setup-kubectl@v3
         with:
-          version: v1.25.6
+          version: ${{ vars.AEVAN_KUBECTL_VERSION }}
 
       - name: Apply kubeconfig
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
-      - name: Kubectl version
-        run: kubectl version
+      - name: Kubectl apply pg secrets
+        run: |
+          kubectl create secret generic postgres-secret \
+          --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }}
+
+      - name: Kubectl apply pg
+        run: kubectl apply -f deployment/infrastructure/pg/
+
+      - name: create pg.migrate.yaml manifest
+        uses: danielr1996/envsubst-action@1.0.0
+        env:
+          MIGRATE_IMAGE_NAME: ${{ env.MIGRATE_IMAGE_NAME }}:${{ github.run_number }}
+        with:
+          input: deployment/templates/pg.migrate.template.yaml
+          output: pg.migrate.yaml
+
+      - name: run pg.migrate.yaml
+        run: kubectl apply -f pg.migrate.yaml
+
+      - name: Kubectl apply hasura secrets
+        run: |
+          kubectl create secret generic postgres-secret \
+          kubectl create secret generic hasura-secret \
+          --from-literal=db-metadata-url=postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/hasura \ 
+          --from-literal=admin-secret=${{ secrets.HASURA_ADMIN_SECRET }}
+
+      - name: kubeclt apply hasura
+        run: |
+          kubectl create configmap hasura-config \
+          --from-literal=host=${{ vars.HASURA_HOST }}
+
+      - name: Kubectl apply hasura
+        run: kubectl apply -f deployment/infrastructure/hasura/

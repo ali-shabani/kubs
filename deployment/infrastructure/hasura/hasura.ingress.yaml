@@ -2,9 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hasura-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      server_name $host;
+      set $host {{ include "hasura-config.host" . }};
 spec:
   rules:
-    - host: hasura.buynowco.ir
+    - host: $(host)
       http:
         paths:
           - pathType: Prefix
