@@ -5,6 +5,8 @@ metadata:
 spec:
   template:
     spec:
+      imagePullSecrets:
+        - name: github-packages
       initContainers:
         - name: check-postgres
           image: postgres:16.2
@@ -12,7 +14,6 @@ spec:
             - sh
             - -c
             - |
-              export PGPASSWORD=$POSTGRES_PASSWORD
               until pg_isready -h postgres -p 5432; do
                 echo waiting for database
                 sleep 2
