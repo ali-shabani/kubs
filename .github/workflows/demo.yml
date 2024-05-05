@@ -1,6 +1,10 @@
 name: deploy
 on: push
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/db-migrate
+
 jobs:
   build_image:
     name: build migate image
@@ -8,14 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          # list of Docker images to use as base name for tags
-          images: ghcr.io/buynow/db-migrate
-          # generate Docker tags based on the following events/attributes
-          tags: type=sha
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -23,16 +19,22 @@ jobs:
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./db
           file: ./db/Dockerfile
           push: true
-          tags: buynow/db-migrate:${{ github.run_number }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=buynow/db-migrate:latest
           cache-to: type=inline
   deploy:
@@ -48,7 +50,7 @@ jobs:
       - name: Apply kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode --decode > ~/.kube/config
+          echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
       - name: Kubectl version
         run: kubectl version
