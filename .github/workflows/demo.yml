@@ -82,7 +82,9 @@ jobs:
           output: pg.migrate.yaml
 
       - name: run pg.migrate.yaml
-        run: kubectl apply -f pg.migrate.yaml
+        run: |
+          kubectl apply -f pg.migrate.yaml
+          kubectl wait --for=condition=complete job/db-migration --timeout=60s
 
       - name: Kubectl apply hasura secrets
         run: |
