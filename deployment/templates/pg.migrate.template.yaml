@@ -9,11 +9,14 @@ spec:
         - name: check-postgres
           image: postgres:16.2
           command:
-            [
-              "sh",
-              "-c",
-              "until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;",
-            ]
+            - sh
+            - -c
+            - |
+              export PGPASSWORD=$POSTGRES_PASSWORD
+              until pg_isready -h postgres -p 5432; do
+                echo waiting for database
+                sleep 2
+              done
 
       containers:
         - name: db-migration
