@@ -58,6 +58,7 @@ jobs:
 
       - name: Kubectl apply pg secrets
         run: |
+          kubectl delete secret postgres-secret --ignore-not-found
           kubectl create secret generic postgres-secret \
           --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }}
 
@@ -77,6 +78,7 @@ jobs:
 
       - name: Kubectl apply hasura secrets
         run: |
+          kubectl delete secret hasura-secret --ignore-not-found
           kubectl create secret generic hasura-secret \
           --from-literal=db-metadata-url=postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/hasura \ 
           --from-literal=admin-secret=${{ secrets.HASURA_ADMIN_SECRET }}
