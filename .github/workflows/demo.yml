@@ -3,7 +3,7 @@ on: push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/db-migrate
+  IMAGE_NAME: ${{ github.repository }}/db-migrate
 
 jobs:
   build_image:
