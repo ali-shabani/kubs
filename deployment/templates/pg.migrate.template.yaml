@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      ttlSecondsAfterFinished: 120
       imagePullSecrets:
         - name: github-packages
       initContainers:
