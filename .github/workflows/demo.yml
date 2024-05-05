@@ -30,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}
           tags: type=raw,value=${{ github.run_number }}
       - name: Build and push
         uses: docker/build-push-action@v5
