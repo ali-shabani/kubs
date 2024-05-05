@@ -58,7 +58,7 @@ jobs:
 
       - name: create
         run: |
-          kubectl delete secret github-packages
+          kubectl delete secret github-packages --ignore-not-found
           kubectl create secret docker-registry github-packages \
           --docker-server=${{ env.REGISTRY }} \
           --docker-username=${{github.actor}} \
