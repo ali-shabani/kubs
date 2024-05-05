@@ -35,8 +35,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=buynow/db-migrate:latest
-          cache-to: type=inline
   deploy:
     name: deploy to cluster
     runs-on: ubuntu-latest
