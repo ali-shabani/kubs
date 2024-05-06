@@ -15,7 +15,5 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gettext-base
 
       - name: Run substitute-env-vars.sh script
-        run: |
-          chmod +x substitute-env-vars.sh
-          ./scripts/substitute-env-vars.sh ${{ inputs.directory }}
+        run: ./scripts/substitute-env-vars.sh ${{ inputs.directory }}
         shell: bash

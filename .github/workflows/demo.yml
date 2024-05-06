@@ -6,40 +6,40 @@ env:
   MIGRATE_IMAGE_NAME: ${{ github.repository }}/db-migrate
 
 jobs:
-  build_image:
-    name: build migate image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+  # build_image:
+  #   name: build migate image
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}
-          tags: type=raw,value=${{ github.run_number }}
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ./db
-          file: ./db/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     - name: Login to GHCR
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}
+  #         tags: type=raw,value=${{ github.run_number }}
+  #     - name: Build and push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./db
+  #         file: ./db/Dockerfile
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
   deploy:
     name: deploy to cluster
     runs-on: ubuntu-latest
@@ -56,47 +56,59 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
-      - name: create
-        run: |
-          kubectl delete secret github-packages --ignore-not-found
-          kubectl create secret docker-registry github-packages \
-          --docker-server=${{ env.REGISTRY }} \
-          --docker-username=${{github.actor}} \
-          --docker-password=${{ secrets.REGISTERY_PASSWORD }}
-
-      - name: Kubectl apply pg secrets
-        run: |
-          kubectl delete secret postgres-secret --ignore-not-found
-          kubectl create secret generic postgres-secret \
-          --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }}
-
-      - name: Kubectl apply pg
-        run: kubectl apply -f deployment/infrastructure/pg/
-
-      - name: create pg.migrate.yaml manifest
-        uses: danielr1996/envsubst-action@1.0.0
-        env:
-          MIGRATE_IMAGE_NAME: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ github.run_number }}
+      - name: replace envs
+        uses: ./.github/workflows/subtitue-env-vars.yml
         with:
-          input: deployment/templates/pg.migrate.template.yaml
-          output: pg.migrate.yaml
+          directory: deployment
+        env:
+          HOST: ${{ vars.HOST }}
 
-      - name: run pg.migrate.yaml
+      - name: log the output
         run: |
-          kubectl apply -f pg.migrate.yaml
-          kubectl wait --for=condition=complete job/db-migration --timeout=60s
+          cat deployment/infrastructure/hasura/hasura.ingress.yaml
+          cat deployment/infrastructure/pg/pg.migrate.yaml
 
-      - name: Kubectl apply hasura secrets
-        run: |
-          kubectl delete secret hasura-secret --ignore-not-found
-          kubectl create secret generic hasura-secret \
-          --from-literal=db-metadata-url=postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/hasura \
-          --from-literal=admin-secret=${{ secrets.HASURA_ADMIN_SECRET }}
+      # - name: create
+      #   run: |
+      #     kubectl delete secret github-packages --ignore-not-found
+      #     kubectl create secret docker-registry github-packages \
+      #     --docker-server=${{ env.REGISTRY }} \
+      #     --docker-username=${{github.actor}} \
+      #     --docker-password=${{ secrets.REGISTERY_PASSWORD }}
 
-      - name: kubeclt apply hasura
-        run: |
-          kubectl create configmap hasura-config \
-          --from-literal=host=${{ vars.HASURA_HOST }}
+      # - name: Kubectl apply pg secrets
+      #   run: |
+      #     kubectl delete secret postgres-secret --ignore-not-found
+      #     kubectl create secret generic postgres-secret \
+      #     --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }}
 
-      - name: Kubectl apply hasura
-        run: kubectl apply -f deployment/infrastructure/hasura/
+      # - name: Kubectl apply pg
+      #   run: kubectl apply -f deployment/infrastructure/pg/
+
+      # - name: create pg.migrate.yaml manifest
+      #   uses: danielr1996/envsubst-action@1.0.0
+      #   env:
+      #     MIGRATE_IMAGE_NAME: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ github.run_number }}
+      #   with:
+      #     input: deployment/templates/pg.migrate.template.yaml
+      #     output: pg.migrate.yaml
+
+      # - name: run pg.migrate.yaml
+      #   run: |
+      #     kubectl apply -f pg.migrate.yaml
+      #     kubectl wait --for=condition=complete job/db-migration --timeout=60s
+
+      # - name: Kubectl apply hasura secrets
+      #   run: |
+      #     kubectl delete secret hasura-secret --ignore-not-found
+      #     kubectl create secret generic hasura-secret \
+      #     --from-literal=db-metadata-url=postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/hasura \
+      #     --from-literal=admin-secret=${{ secrets.HASURA_ADMIN_SECRET }}
+
+      # - name: kubeclt apply hasura
+      #   run: |
+      #     kubectl create configmap hasura-config \
+      #     --from-literal=host=${{ vars.HASURA_HOST }}
+
+      # - name: Kubectl apply hasura
+      #   run: kubectl apply -f deployment/infrastructure/hasura/
