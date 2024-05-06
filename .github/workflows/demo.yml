@@ -60,8 +60,7 @@ jobs:
           echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
       - name: Run substitute-env-vars.sh script
-        run: ./.github/scripts/substitute-env-vars.sh ${{ inputs.directory }}
-        shell: bash
+        run: bash ./.github/scripts/substitute-env-vars.sh ${{ inputs.directory }}
         env:
           HOST: ${{ vars.HOST }}
 
