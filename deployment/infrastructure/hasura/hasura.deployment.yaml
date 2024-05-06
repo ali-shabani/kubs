@@ -16,17 +16,18 @@ spec:
     spec:
       initContainers:
         - name: check-postgres
-          image: postgres:16.2
+          image: "postgres:16.2"
           command:
-            [
-              "sh",
-              "-c",
-              "until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;",
-            ]
-
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres -p 5432; do
+                echo waiting for database
+                sleep 2
+              done
       containers:
         - name: hasura
-          image: hasura/graphql-engine:v2.38.1
+          image: "hasura/graphql-engine:v2.38.1"
           imagePullPolicy: IfNotPresent
           env:
             - name: HASURA_GRAPHQL_METADATA_DATABASE_URL
@@ -39,6 +40,11 @@ spec:
                 secretKeyRef:
                   name: hasura-secret
                   key: db-buynow-url
+            - name: HASURA_GRAPHQL_ADMIN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hasura-secret
+                  key: admin-secret
             - name: HASURA_GRAPHQL_ENABLE_CONSOLE
               value: "true"
             - name: HASURA_GRAPHQL_INFER_FUNCTION_PERMISSIONS
@@ -47,18 +53,14 @@ spec:
               value: "true"
             - name: HASURA_GRAPHQL_UNAUTHORIZED_ROLE
               value: public
-            - name: HASURA_GRAPHQL_ADMIN_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: hasura-secret
-                  key: admin-secret
+
           resources:
             requests:
-              cpu: "250m"
-              memory: "500Mi"
+              cpu: 250m
+              memory: 500Mi
             limits:
-              cpu: "250m"
-              memory: "500Mi"
+              cpu: 250m
+              memory: 500Mi
           ports:
             - name: http
               containerPort: 8080
@@ -71,7 +73,7 @@ spec:
             httpGet:
               path: /healthz
               port: http
-            initialDelaySeconds: 10 # Time before the first probe is initiated.
-            timeoutSeconds: 5 # Time to wait for a probe response.
-            periodSeconds: 10 # How often to perform the probe.
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
             failureThreshold: 3
