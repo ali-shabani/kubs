@@ -47,7 +47,7 @@ spec:
             - name: HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS
               value: "true"
             - name: HASURA_GRAPHQL_UNAUTHORIZED_ROLE
-              value: public
+              value: "public"
 
           resources:
             requests:
