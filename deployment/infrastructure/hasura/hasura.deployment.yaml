@@ -41,6 +41,8 @@ spec:
               value: "true"
             - name: HASURA_GRAPHQL_UNAUTHORIZED_ROLE
               value: public
+            - name: HASURA_GRAPHQL_ENABLE_TELEMETRY
+              value: "false"
             - name: HASURA_GRAPHQL_ADMIN_SECRET
               valueFrom:
                 secretKeyRef:
