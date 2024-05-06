@@ -28,4 +28,11 @@ spec:
                 secretKeyRef:
                   name: hasura-secret
                   key: db-metadata-url
+            - name: BUYNOW_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hasura-secret
+                  key: db-buynow-url
+            - name: HASURA_GRAPHQL_ENABLE_TELEMETRY
+              value: "false"
       restartPolicy: OnFailure
