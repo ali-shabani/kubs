@@ -11,7 +11,7 @@ RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VER
 COPY hasura /hasura
 
 # Set the Hasura GraphQL Engine endpoint as an environment variable
-# ENV HASURA_GRAPHQL_ENDPOINT=http://hasura:8080
+ENV HASURA_GRAPHQL_ENDPOINT=http://hasura:8080
 
 # Use the entrypoint to apply metadata
-ENTRYPOINT ["hasura", "metadata", "apply", "--endpoint", "http://hasura:8080", "--admin-secret", "$HASURA_ADMIN_SECRET", "--project", "hasura"]
+ENTRYPOINT ["sh", "-c", "hasura metadata apply --endpoint $HASURA_GRAPHQL_ENDPOINT --admin-secret $HASURA_ADMIN_SECRET --project hasura"]
