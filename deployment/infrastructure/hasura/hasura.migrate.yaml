@@ -8,8 +8,8 @@ spec:
       imagePullSecrets:
         - name: github-packages
       initContainers:
-        - name: check-postgres
-          image: postgres:16.2
+        - name: wait-for-hasura
+          image: curlimages/curl:8.7.1
           command:
             - sh
             - -c
