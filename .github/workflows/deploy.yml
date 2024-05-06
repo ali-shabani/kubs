@@ -143,6 +143,7 @@ jobs:
           HASURA_MIGRATION_IMAGE_NAME: ${{ needs.build_hasura_migartion_image.outputs.hasura_migration_image_name }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
 
       - name: Apply all Kubernetes manifests in deployment folder
         run: |
