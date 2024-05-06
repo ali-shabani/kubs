@@ -24,8 +24,7 @@ jobs:
           echo "APPLICABLE_MIGRATE_IMAGE_NAME=${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ env.MIGRATION_SHA }}" >> $GITHUB_ENV
 
       - name: Set output
-        id: set_env
-        run: echo "::set-output name=migrate_image_name::${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}"
+        run: echo "migrate_image_name=${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -86,56 +85,12 @@ jobs:
         run: bash ./.github/scripts/substitute-env-vars.sh -d deployment -e "*/init-db.config.yaml"
         env:
           HOST: ${{ vars.HOST }}
-          APPLICABLE_MIGRATE_IMAGE_NAME: ${{ needs.build_image.outputs.migrate_image_name }}"
+          APPLICABLE_MIGRATE_IMAGE_NAME: ${{ needs.build_image.outputs.migrate_image_name }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
 
       - name: Apply all Kubernetes manifests in deployment folder
         run: |
-          kubectl apply -f deployment/secrets/
-          kubectl apply -f deployment/infrastructure/pg/
-          kubectl apply -f deployment/infrastructure/hasura/
-      # - name: create
-      #   run: |
-      #     kubectl delete secret github-packages --ignore-not-found
-      #     kubectl create secret docker-registry github-packages \
-      #     --docker-server=${{ env.REGISTRY }} \
-      #     --docker-username=${{github.actor}} \
-      #     --docker-password=${{ secrets.REGISTERY_PASSWORD }}
-
-      # - name: Kubectl apply pg secrets
-      #   run: |
-      #     kubectl delete secret postgres-secret --ignore-not-found
-      #     kubectl create secret generic postgres-secret \
-      #     --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }}
-
-      # - name: Kubectl apply pg
-      #   run: kubectl apply -f deployment/infrastructure/pg/
-
-      # - name: create pg.migrate.yaml manifest
-      #   uses: danielr1996/envsubst-action@1.0.0
-      #   env:
-      #     MIGRATE_IMAGE_NAME: ${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ github.run_number }}
-      #   with:
-      #     input: deployment/templates/pg.migrate.template.yaml
-      #     output: pg.migrate.yaml
-
-      # - name: run pg.migrate.yaml
-      #   run: |
-      #     kubectl apply -f pg.migrate.yaml
-      #     kubectl wait --for=condition=complete job/db-migration --timeout=60s
-
-      # - name: Kubectl apply hasura secrets
-      #   run: |
-      #     kubectl delete secret hasura-secret --ignore-not-found
-      #     kubectl create secret generic hasura-secret \
-      #     --from-literal=db-metadata-url=postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/hasura \
-      #     --from-literal=admin-secret=${{ secrets.HASURA_ADMIN_SECRET }}
-
-      # - name: kubeclt apply hasura
-      #   run: |
-      #     kubectl create configmap hasura-config \
-      #     --from-literal=host=${{ vars.HASURA_HOST }}
-
-      # - name: Kubectl apply hasura
-      #   run: kubectl apply -f deployment/infrastructure/hasura/
+          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/secrets/"
+          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/pg/"
+          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/hasura/"
