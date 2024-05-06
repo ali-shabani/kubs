@@ -47,10 +47,11 @@ jobs:
         id: check_image
         run: |
           IMAGE_EXISTS=$(docker manifest inspect ${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }} > /dev/null 2>&1 && echo "true" || echo "false")
-          echo "::set-output name=exists::${IMAGE_EXISTS}"
+          echo IMAGE_EXISTS
+          echo "image_exists=${IMAGE_EXISTS}" >> $GITHUB_OUTPUT
 
       - name: Build and push
-        if: steps.check_image.outputs.exists == 'false'
+        if: steps.check_image.outputs.image_exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: ./db
@@ -58,39 +59,39 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  deploy:
-    name: deploy to cluster
-    runs-on: ubuntu-latest
-    needs: build_image
-    steps:
-      - name: Install envsubst
-        run: sudo apt-get update && sudo apt-get install -y gettext-base
+  # deploy:
+  #   name: deploy to cluster
+  #   runs-on: ubuntu-latest
+  #   needs: build_image
+  #   steps:
+  #     - name: Install envsubst
+  #       run: sudo apt-get update && sudo apt-get install -y gettext-base
 
-      - uses: actions/checkout@v4
-      - name: deploy to cluster
-        uses: azure/setup-kubectl@v3
-        with:
-          version: ${{ vars.ARVAN_KUBE_VERSION }}
+  #     - uses: actions/checkout@v4
+  #     - name: deploy to cluster
+  #       uses: azure/setup-kubectl@v3
+  #       with:
+  #         version: ${{ vars.ARVAN_KUBE_VERSION }}
 
-      - name: Apply kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
+  #     - name: Apply kubeconfig
+  #       run: |
+  #         mkdir -p ~/.kube
+  #         echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
-      - name: create
-        run: |
-          echo REGISTERY_SECRET_GITHUB=$(echo -n '{"auths": {"${{ env.REGISTRY }}": {"username": "${{github.actor}}", "password": "${{ secrets.REGISTERY_PASSWORD }}"}}}' | base64 -w 0) >> $GITHUB_ENV
+  #     - name: create
+  #       run: |
+  #         echo REGISTERY_SECRET_GITHUB=$(echo -n '{"auths": {"${{ env.REGISTRY }}": {"username": "${{github.actor}}", "password": "${{ secrets.REGISTERY_PASSWORD }}"}}}' | base64 -w 0) >> $GITHUB_ENV
 
-      - name: Run substitute-env-vars.sh script
-        run: bash ./.github/scripts/substitute-env-vars.sh -d deployment -e "*/init-db.config.yaml"
-        env:
-          HOST: ${{ vars.HOST }}
-          APPLICABLE_MIGRATE_IMAGE_NAME: ${{ needs.build_image.outputs.migrate_image_name }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
+  #     - name: Run substitute-env-vars.sh script
+  #       run: bash ./.github/scripts/substitute-env-vars.sh -d deployment -e "*/init-db.config.yaml"
+  #       env:
+  #         HOST: ${{ vars.HOST }}
+  #         APPLICABLE_MIGRATE_IMAGE_NAME: ${{ needs.build_image.outputs.migrate_image_name }}
+  #         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  #         HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
 
-      - name: Apply all Kubernetes manifests in deployment folder
-        run: |
-          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/secrets/"
-          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/pg/"
-          bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/hasura/"
+  #     - name: Apply all Kubernetes manifests in deployment folder
+  #       run: |
+  #         bash ./.github/scripts/retry.sh "kubectl apply -f deployment/secrets/"
+  #         bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/pg/"
+  #         bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/hasura/"
