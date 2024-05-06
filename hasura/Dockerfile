@@ -1,7 +1,8 @@
 # Use Ubuntu as the base image
 FROM ubuntu:latest
 
-RUN apt-get install -y curl 
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Install Hasura CLI using the provided command
 RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.38.0 bash
 
