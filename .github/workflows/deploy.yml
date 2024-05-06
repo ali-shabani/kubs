@@ -147,5 +147,7 @@ jobs:
       - name: Apply all Kubernetes manifests in deployment folder
         run: |
           bash ./.github/scripts/retry.sh "kubectl apply -f deployment/secrets/"
+          kubectl delete -f deployment/infrastructure/pg/pg.migrate.yaml --ignore-not-found
           bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/pg/"
+          kubectl delete -f deployment/infrastructure/hasura/hasura.migrate.yaml --ignore-not-found
           bash ./.github/scripts/retry.sh "kubectl apply -f deployment/infrastructure/hasura/"
