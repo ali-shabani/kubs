@@ -21,8 +21,9 @@ jobs:
       - name: create sha from migration
         run: |
           echo "MIGRATION_SHA=$(sha256sum db/migrations/atlas.sum | awk '{print $1}')" >> "$GITHUB_ENV"
-          echo MIGRATION_SHA=$MIGRATION_SHA
-          echo MIGRATION_SHA=${{ env.MIGRATION_SHA }}
+
+      - name: extract applicable migrate image name
+        run: |
           echo "APPLICABLE_MIGRATE_IMAGE_NAME=${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ env.MIGRATION_SHA }}" >> "$GITHUB_ENV"
 
       - name: Set output
