@@ -60,7 +60,7 @@ jobs:
           echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
       - name: Run substitute-env-vars.sh script
-        run: bash ./.github/scripts/substitute-env-vars.sh deployment
+        run: bash ./.github/scripts/substitute-env-vars.sh -d deployment -e "*/init-db.config.yaml"
         env:
           HOST: ${{ vars.HOST }}
 
@@ -68,6 +68,7 @@ jobs:
         run: |
           cat deployment/infrastructure/hasura/hasura.ingress.yaml
           cat deployment/infrastructure/pg/pg.migrate.yaml
+          cat deployment/infrastructure/pg/init-db.config.yaml
 
       # - name: create
       #   run: |
