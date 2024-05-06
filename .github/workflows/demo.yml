@@ -45,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     # needs: build_image
     steps:
+      - name: Install envsubst
+        run: sudo apt-get update && sudo apt-get install -y gettext-base
+
       - uses: actions/checkout@v4
       - name: deploy to cluster
         uses: azure/setup-kubectl@v3
@@ -56,10 +59,9 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.ARVAN_KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
-      - name: replace envs
-        uses: ./.github/workflows/subtitue-env-vars.yml
-        with:
-          directory: deployment
+      - name: Run substitute-env-vars.sh script
+        run: ./scripts/substitute-env-vars.sh ${{ inputs.directory }}
+        shell: bash
         env:
           HOST: ${{ vars.HOST }}
 
