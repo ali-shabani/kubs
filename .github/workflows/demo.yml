@@ -71,13 +71,11 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
 
-      - name: log the output
+      - name: Apply all Kubernetes manifests in deployment folder
         run: |
-          cat deployment/infrastructure/hasura/hasura.ingress.yaml
-          cat deployment/infrastructure/pg/pg.migrate.yaml
-          cat deployment/infrastructure/pg/init-db.config.yaml
-          cat deployment/secrets/*.yaml
-
+          kubectl apply -f deployment/secrets/
+          kubectl apply -f deployment/infrastructure/pg/
+          kubectl apply -f deployment/infrastructure/hasura/
       # - name: create
       #   run: |
       #     kubectl delete secret github-packages --ignore-not-found
