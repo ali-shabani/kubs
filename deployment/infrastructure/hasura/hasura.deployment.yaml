@@ -33,21 +33,22 @@ spec:
                 secretKeyRef:
                   name: hasura-secret
                   key: db-metadata-url
-            - name: HASURA_GRAPHQL_ENABLE_CONSOLE
-              value: "true"
-            - name: HASURA_GRAPHQL_INFER_FUNCTION_PERMISSIONS
-              value: "false"
-            - name: HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS
-              value: "true"
-            - name: HASURA_GRAPHQL_UNAUTHORIZED_ROLE
-              value: "public"
-            - name: HASURA_GRAPHQL_ENABLE_TELEMETRY
-              value: "false"
             - name: HASURA_GRAPHQL_ADMIN_SECRET
               valueFrom:
                 secretKeyRef:
                   name: hasura-secret
                   key: admin-secret
+            - name: HASURA_GRAPHQL_ENABLE_CONSOLE
+              value: "true"
+            - name: HASURA_GRAPHQL_ENABLE_TELEMETRY
+              value: "false"
+            - name: HASURA_GRAPHQL_INFER_FUNCTION_PERMISSIONS
+              value: "false"
+            - name: HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS
+              value: "true"
+            - name: HASURA_GRAPHQL_UNAUTHORIZED_ROLE
+              value: public
+
           resources:
             requests:
               cpu: "250m"
