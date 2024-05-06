@@ -17,4 +17,4 @@ WORKDIR /hasura
 ENV HASURA_GRAPHQL_ENDPOINT=http://hasura:8080
 
 # Use the entrypoint to apply metadata
-ENTRYPOINT ["hasura", "metadata", "apply", "--endpoint", "$HASURA_GRAPHQL_ENDPOINT", "--admin-secret", "$HASURA_ADMIN_SECRET", "--project", "/hasura"]
+ENTRYPOINT ["hasura", "metadata", "apply", "--endpoint", "$HASURA_GRAPHQL_ENDPOINT", "--admin-secret", "$HASURA_ADMIN_SECRET", "--project", "hasura"]
