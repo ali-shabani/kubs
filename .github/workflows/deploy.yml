@@ -4,15 +4,16 @@ on: push
 env:
   REGISTRY: ghcr.io
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build_db_migration_image:
     name: Build Database Migration Image
     runs-on: ubuntu-latest
     outputs:
       atlas_migration_image_name: ${{ steps.set_output.outputs.atlas_migration_image_name }}
-    permissions:
-      contents: read
-      packages: write
     env:
       IMAGE_NAME: ${{ github.repository }}/db-migrate
 
