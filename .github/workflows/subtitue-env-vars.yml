@@ -1,0 +1,21 @@
+name: Reusable envsubst Workflow
+
+on:
+  workflow_call:
+    inputs:
+      directory:
+        required: true
+        type: string
+
+jobs:
+  substitute-env-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install envsubst
+        run: sudo apt-get update && sudo apt-get install -y gettext-base
+
+      - name: Run substitute-env-vars.sh script
+        run: |
+          chmod +x substitute-env-vars.sh
+          ./scripts/substitute-env-vars.sh ${{ inputs.directory }}
+        shell: bash
