@@ -10,9 +10,6 @@ RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VER
 # Copy the Hasura metadata folder to the container
 COPY hasura /hasura
 
-# Set the working directory to /hasura
-WORKDIR /hasura
-
 # Set the Hasura GraphQL Engine endpoint as an environment variable
 ENV HASURA_GRAPHQL_ENDPOINT=http://hasura:8080
 
