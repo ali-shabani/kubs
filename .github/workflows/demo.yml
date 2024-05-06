@@ -10,7 +10,7 @@ jobs:
     name: build migate image
     runs-on: ubuntu-latest
     outputs:
-      migrate_image_name: ${{ steps.set_env.outputs.migrate_image_name }}
+      migrate_image_name: ${{ steps.set_output.outputs.migrate_image_name }}
     permissions:
       contents: read
       packages: write
@@ -27,7 +27,8 @@ jobs:
           echo "APPLICABLE_MIGRATE_IMAGE_NAME=${{ env.REGISTRY }}/${{ env.MIGRATE_IMAGE_NAME }}:${{ env.MIGRATION_SHA }}" >> "$GITHUB_ENV"
 
       - name: Set output
-        run: echo "migrate_image_name=${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}" >> $GITHUB_OUTPUT
+        id: set_output
+        run: echo "migrate_image_name=${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -51,8 +52,6 @@ jobs:
         run: |
           echo MIGRATION_SHA=${{ env.MIGRATION_SHA }}
           IMAGE_EXISTS=$(docker manifest inspect ${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }} > /dev/null 2>&1 && echo "true" || echo "false")
-          echo IMAGE_EXISTS=$IMAGE_EXISTS
-          echo ${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}
           echo "image_exists=${IMAGE_EXISTS}" >> $GITHUB_OUTPUT
 
       - name: Build and push
