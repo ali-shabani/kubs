@@ -8,10 +8,12 @@ RUN apk add --no-cache curl bash
 RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.37.0 sh
 
 # Copy the Hasura metadata folder to the container
-COPY hasura ./hasura
+COPY hasura /hasura
+
+WORKDIR /hasura
 
 # Set the Hasura GraphQL Engine endpoint as an environment variable
 ENV HASURA_GRAPHQL_ENDPOINT=http://hasura:8080
 
 # Use the entrypoint to apply metadata
-ENTRYPOINT ["hasura", "metadata", "apply", "--endpoint", "$HASURA_GRAPHQL_ENDPOINT", "--admin-secret", "$HASURA_ADMIN_SECRET", "--project", "hasura"]
+ENTRYPOINT ["hasura", "metadata", "apply", "--endpoint", "$HASURA_GRAPHQL_ENDPOINT", "--admin-secret", "$HASURA_ADMIN_SECRET"]
