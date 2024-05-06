@@ -21,7 +21,7 @@ spec:
 
       containers:
         - name: db-migration
-          image: ${MIGRATE_IMAGE_NAME}
+          image: ${APPLICABLE_MIGRATE_IMAGE_NAME}
           args:
             - "migrate"
             - "apply"
