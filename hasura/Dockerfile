@@ -2,7 +2,8 @@
 FROM alpine:latest
 
 # Install curl, bash, and other dependencies
-RUN apk add --no-cache curl bash
+RUN apk add --no-cache curl bash libstdc++6 libstdc++
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community gcompat
 
 # Install Hasura CLI using the provided command
 RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.38.0 sh
