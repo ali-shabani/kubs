@@ -14,8 +14,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgres -p 5432; do
-                echo waiting for database
+              until curl --fail http://hasura:8080/healthz; do
+                echo "Waiting for Hasura to be ready..."
                 sleep 2
               done
 
