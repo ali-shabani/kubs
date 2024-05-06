@@ -20,17 +20,12 @@ spec:
               done
 
       containers:
-        - name: db-migration
-          image: ${DB_MIGRATION_IMAGE_NAME}
-          args:
-            - "migrate"
-            - "apply"
-            - "--url"
-            - "postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/buynow?sslmode=disable"
+        - name: hasura-migration
+          image: ${HASURA_MIGRATION_IMAGE_NAME}
           env:
-            - name: POSTGRES_PASSWORD
+            - name: HASURA_GRAPHQL_METADATA_DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: postgres-password
+                  name: hasura-secret
+                  key: db-metadata-url
       restartPolicy: OnFailure
