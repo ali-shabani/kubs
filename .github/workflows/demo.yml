@@ -48,6 +48,7 @@ jobs:
         run: |
           IMAGE_EXISTS=$(docker manifest inspect ${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }} > /dev/null 2>&1 && echo "true" || echo "false")
           echo IMAGE_EXISTS=$IMAGE_EXISTS
+          echo ${{ env.APPLICABLE_MIGRATE_IMAGE_NAME }}
           echo "image_exists=${IMAGE_EXISTS}" >> $GITHUB_OUTPUT
 
       - name: Build and push
