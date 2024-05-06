@@ -1,9 +1,8 @@
-# Use Alpine Linux as the base image
-FROM alpine:latest
+# Use Ubuntu as the base image
+FROM ubuntu:latest
 
 # Install curl, bash, and other dependencies
-RUN apk add --no-cache curl bash libstdc++6 libstdc++
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community gcompat
+RUN apt-get update && apt-get install -y curl bash && rm -rf /var/lib/apt/lists/*
 
 # Install Hasura CLI using the provided command
 RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.38.0 sh
