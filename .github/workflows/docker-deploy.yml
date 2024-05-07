@@ -16,6 +16,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          envkey_HASURA_ADMIN_SECRET: ${{ vars.HASURA_ADMIN_SECRET }}
+          envkey_BUYNOW_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/buynow
+          directory: .
+          file_name: .env
+          fail_on_empty: false
+
       - name: copy file via ssh password
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -23,7 +35,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           overwrite: true
-          source: "db,deployment,hasura"
+          source: "db,deployment,hasura,.env"
           target: app
 
       - name: executing remote ssh commands using password
@@ -32,4 +44,7 @@ jobs:
           host: ${{ vars.SERVER_IP }}
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          script: ls
+          script: |
+            cd app
+            docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.yml up -d
+            docker compose --env-file .env -f deployment/docker/jobs/docker-compose.yml up -d
