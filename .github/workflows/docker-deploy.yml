@@ -1,12 +1,5 @@
-name: deploy
+name: docker deploy
 on: push
-
-env:
-  REGISTRY: ghcr.io
-
-permissions:
-  contents: read
-  packages: write
 
 jobs:
   deploy:
@@ -15,6 +8,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create zone file
+        run: |
+          echo "api 120 A ${{ vars.SERVER_IP }}" >> zonefile
+          echo "emqx 120 A ${{ vars.SERVER_IP }}" >> zonefile
+
+      - name: Deploy Stage
+        run: |
+          curl -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records" \
+            -H "Content-Type: multipart/form-data" \
+            -H "Authorization: ${{ secrets.ARVAN_API_KEY }}" \
+            -F "f_zone_file=@zonefile"
 
       - name: Make envfile
         run: |
@@ -45,3 +50,4 @@ jobs:
             docker network create infrastructure || true
             docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.yml up -d
             docker compose --env-file .env -f deployment/docker/jobs/docker-compose.yml up -d
+            docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d

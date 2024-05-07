@@ -13,7 +13,6 @@ services:
       - "443:443/udp"
     networks:
       - infrastructure
-      - blue-network
 
 volumes:
   caddy_data:
@@ -21,8 +20,4 @@ volumes:
 
 networks:
   inftastructure:
-    external: true
-  blue-network:
-    external: true
-  green-network:
     external: true

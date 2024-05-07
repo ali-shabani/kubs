@@ -1,3 +1,7 @@
 api.{$ROOT_DOMAIN} {
 	reverse_proxy http://hasura:8080
 }
+
+emqx.{$ROOT_DOMAIN} {
+	reverse_proxy http://emqx:18083
+}
