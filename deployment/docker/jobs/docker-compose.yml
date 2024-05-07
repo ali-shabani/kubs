@@ -8,7 +8,7 @@ services:
       - |
         attempt_counter=0
         max_attempts=5
-        until pg_isready -h postgres; do
+        until pg_isready -h postgres -U postgres; do
           attempt_counter=$(($attempt_counter+1))
           if [ $attempt_counter -eq $max_attempts ]; then
             echo "postgres is not ready after $max_attempts attempts. Exiting."
