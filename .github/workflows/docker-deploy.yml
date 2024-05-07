@@ -22,7 +22,7 @@ jobs:
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "HASURA_ADMIN_SECRET=${{ secrets.HASURA_ADMIN_SECRET }}" >> .env
-          echo "BUYNOW_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/buynow" >> .env
+          echo "BUYNOW_DATABASE_URL=postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/buynow" >> .env
 
       - name: copy file via ssh password
         uses: appleboy/scp-action@v0.1.7
