@@ -16,7 +16,7 @@ jobs:
 
       - name: Deploy Stage
         run: |
-          curl -v -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/imports" \
+          curl -v -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
             -H "Content-Type: multipart/form-data" \
             -H "Authorization: ${{ secrets.ARVAN_API_KEY }}" \
             -F "f_zone_file=@zonefile"
