@@ -1,8 +1,6 @@
 services:
   caddy:
-    image: caddy:alpine
-    env_file:
-      - env
+    image: caddy:2.8-alpine
     volumes:
       - "./Caddyfile:/etc/caddy/Caddyfile"
       - "caddy_data:/data"
