@@ -48,7 +48,7 @@ services:
             exit 1
           fi
           echo "Waiting for Hasura to be ready... Attempt: $attempt_counter"
-          sleep 3
+          sleep 10
         done
     networks:
       - infrastructure
