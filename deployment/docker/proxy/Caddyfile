@@ -1,0 +1,3 @@
+api.{$ROOT_DOMAIN} {
+	reverse_proxy http://hasura:8080
+}

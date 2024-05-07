@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emqx-config
+data:
+  listeners.conf: |
+    listeners.ssl.enable_authn = false
+
+  authentication.conf: |
+    authentication = [
+      {
+        method = post
+        mechanism = password_based
+        backend = http
+        url = "http://iam:3000/stations/authenticate"
+        body {
+          clientId = "${clientid}"
+          password = "${password}"
+          username = "${username}"
+        }
+      }
+    ]
+  authorization.conf: |
+    authorization.sources.1 = {
+      type = http
+      url = "http://iam:3000/stations/authorize"
+      body {topic = "${topic}", username = "${username}"}
+      method = post
+    }

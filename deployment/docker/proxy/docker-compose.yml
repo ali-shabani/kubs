@@ -1,0 +1,28 @@
+services:
+  caddy:
+    image: caddy:alpine
+    env_file:
+      - env
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "caddy_data:/data"
+      - "caddy_config:/config"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      - infrastructure
+      - blue-network
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  inftastructure:
+    external: true
+  blue-network:
+    external: true
+  green-network:
+    external: true

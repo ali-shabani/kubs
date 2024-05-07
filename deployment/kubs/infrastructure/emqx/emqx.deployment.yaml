@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emqx-deployment
+  labels:
+    app: emqx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emqx
+  template:
+    metadata:
+      labels:
+        app: emqx
+      specvolumes:
+        - name: config-volume
+          configMap:
+            name: emqx-config
+      containers:
+        - name: emqx
+          image: emqx:5.6.1
+          ports:
+            - name: mqtt
+              containerPort: 1883
+              protocol: TCP
+            - name: ws-mqtt
+              containerPort: 8083
+              protocol: TCP
+            - name: mqtts
+              containerPort: 8883
+              protocol: TCP
+            - name: dashboard
+              containerPort: 18083
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/emqx/data/configs/listeners.conf
+              subPath: listeners.conf
+            # - name: config-volume
+            #   mountPath: /opt/emqx/data/configs/authentication.conf
+            #   subPath: authentication.conf
+            # - name: config-volume
+            #   mountPath: /opt/emqx/data/configs/authorization.conf
+            #   subPath: authorization.conf

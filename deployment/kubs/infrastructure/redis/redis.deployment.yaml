@@ -26,3 +26,10 @@ spec:
                   name: redis-secret # Ensure this secret exists in your cluster
                   key: password
           args: ["--requirepass", "$(REDIS_PASSWORD)"]
+          resources:
+            requests:
+              cpu: 250m
+              memory: 500Mi
+            limits:
+              cpu: 250m
+              memory: 500Mi
