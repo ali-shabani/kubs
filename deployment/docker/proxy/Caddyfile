@@ -8,10 +8,10 @@
     }
 }
 
-# api.{$HOST} {
-# 	reverse_proxy http://hasura:8080
-# }
+api.{$HOST} {
+	reverse_proxy http://hasura:8080
+}
 
-# emqx.{$HOST} {
-# 	reverse_proxy http://emqx:18083
-# }
+emqx.{$HOST} {
+	reverse_proxy http://emqx:18083
+}

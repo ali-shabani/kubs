@@ -13,6 +13,7 @@ jobs:
         run: |
           echo "api 120 A ${{ vars.SERVER_IP }}" >> zonefile
           echo "emqx 120 A ${{ vars.SERVER_IP }}" >> zonefile
+          echo "mqtt 120 A ${{ vars.SERVER_IP }}" >> zonefile
 
       - name: Deploy Stage
         run: |
