@@ -1,4 +1,4 @@
-FROM caddy:2.8-alpine-builder AS builder
+FROM caddy:2.8-builder-alpine AS builder
 
 RUN xcaddy build \
     --with github.com/mholt/caddy-l4 \
