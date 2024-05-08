@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: ./Dockerfile
     image: buynow/caddy:2.8-alpine
+    environment:
+      - HOST=$HOST
     volumes:
       - "./Caddyfile:/etc/caddy/Caddyfile"
       - "caddy_data:/data"
