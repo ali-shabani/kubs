@@ -1,10 +1,14 @@
 services:
   caddy:
-    image: caddy:2.8-alpine
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: buynow/caddy:2.8-alpine
     volumes:
       - "./Caddyfile:/etc/caddy/Caddyfile"
       - "caddy_data:/data"
       - "caddy_config:/config"
+      - "certs:/certs/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
     ports:
       - "80:80"
       - "443:443"
@@ -12,7 +16,21 @@ services:
     networks:
       - infrastructure
 
+  middleware:
+    image: alpine:3.19
+    environment:
+      - DOMAIN=$MQTT_DOMAIN
+    volumes:
+      - certs:/tmp/certs
+      - emqx_certs:/tmp/emqx_certs
+      - ./utils/copy_certs.sh:/copy_certs.sh
+    command: ["sh", "/copy_certs.sh"]
+
 volumes:
+  certs:
+    external: true
+  emqx_certs:
+    external: true
   caddy_data:
   caddy_config:
 

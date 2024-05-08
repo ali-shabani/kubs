@@ -62,27 +62,28 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    environment:
-      EMQX_NAME: buynow_emqx
-      EMQX_HOST: 127.0.0.1
+    # environment:
+    #   EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: "etc/certs/$MQTT_DOMAIN.key"
+    #   EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: "etc/certs/$MQTT_DOMAIN.key"
+    #   EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.pem"
+    #   EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.pem"
     command:
       - sh
       - -c
       - |
         cp /tmp/emqx.conf /opt/emqx/data/configs/cluster.hocon
         /usr/bin/docker-entrypoint.sh /opt/emqx/bin/emqx foreground
-    ports:
-      - "1883:1883"
-      - "8883:8883"
-      - "8083:8083"
     volumes:
       - ./emqx/emqx.conf:/tmp/emqx.conf
+      - emqx_certs:/etc/certs
     networks:
       - infrastructure
 
 volumes:
   pg-vol:
   redis-vol:
+  emqx_certs:
+    external: true
 
 networks:
   infrastructure:

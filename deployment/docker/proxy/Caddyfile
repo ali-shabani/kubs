@@ -1,7 +1,17 @@
-api.{$ROOT_DOMAIN} {
-	reverse_proxy http://hasura:8080
+{
+    layer4 {
+        :1883 {
+            proxy {
+                to emqx:1883
+            }
+        }
+    }
 }
 
-emqx.{$ROOT_DOMAIN} {
-	reverse_proxy http://emqx:18083
-}
+# api.{$HOST} {
+# 	reverse_proxy http://hasura:8080
+# }
+
+# emqx.{$HOST} {
+# 	reverse_proxy http://emqx:18083
+# }
