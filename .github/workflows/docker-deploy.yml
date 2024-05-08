@@ -15,7 +15,7 @@ jobs:
           echo "emqx 120 A ${{ vars.SERVER_IP }}" >> zonefile
           echo "mqtt 120 A ${{ vars.SERVER_IP }}" >> zonefile
 
-      - name: Deploy Stage
+      - name: apply dns records
         run: |
           curl -v -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
             -H "Content-Type: multipart/form-data" \

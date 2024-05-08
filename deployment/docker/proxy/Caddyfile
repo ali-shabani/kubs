@@ -1,8 +1,13 @@
 {
     layer4 {
-        :1883 {
+				:8083 {
             proxy {
-                to emqx:1883
+                to emqx:8083
+            }
+        }
+				:8084 {
+            proxy {
+                to emqx:8084
             }
         }
     }
