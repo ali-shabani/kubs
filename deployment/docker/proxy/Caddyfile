@@ -17,6 +17,10 @@ api.{$HOST} {
 	reverse_proxy http://hasura:8080
 }
 
+mqtt.{$HOST} {
+    
+}
+
 emqx.{$HOST} {
 	reverse_proxy http://emqx:18083
 }
