@@ -19,7 +19,7 @@ jobs:
         run: |
           curl -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
             -H "Content-Type: multipart/form-data" \
-            -H "Authorization: ${{ secrets.ARVAN_API_KEY }}" \
+            -H "Authorization: $(echo '${{ secrets.ARVAN_API_KEY }}' | base64 --decode)" \
             -F "f_zone_file=@zonefile"
 
       - name: Make envfile
