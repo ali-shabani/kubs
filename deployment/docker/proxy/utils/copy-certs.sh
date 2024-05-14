@@ -1,11 +1,16 @@
 #!/bin/sh
 
-# Domain
-domain=${DOMAIN:-"mqtt.buynowco.ir"}
+# Check if DOMAIN is set
+if [ -z "${DOMAIN}" ]; then
+  echo "Error: DOMAIN is not set"
+  exit 1
+fi
+
+domain=${DOMAIN}
 
 # Paths to the certificate and key files
-cert_file="/tmp/certs/${domain}/${domain}.crt"
-key_file="/tmp/certs/${domain}/${domain}.key"
+cert_file="/caddy/certs/${domain}/${domain}.crt"
+key_file="/caddy/certs/${domain}/${domain}.key"
 
 # Path to the destination directory
 dest_dir="/tmp/emqx_certs"
