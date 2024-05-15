@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 ## create external resources if doesn't exist
-sh ./create-external-resources.sh
+bash "$(dirname "$0")/create-external-resources.sh"
 
 ## make a copy of the latest docker-compose as green deployment
 cp deployment/docker/infrastructure/docker-compose.yml deployment/docker/infrastructure/docker-compose.green.yml

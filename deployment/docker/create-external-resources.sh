@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 docker volume create certs
 docker volume create pg-vol
