@@ -3,13 +3,17 @@
 ## create external resources if doesn't exist
 bash "$(dirname "$0")/create-external-resources.sh"
 
+BLUE_COMPOSE_FILE="deployment/docker/infrastructure/docker-compose.yml"
+GREEN_COMPOSE_FILE="deployment/docker/infrastructure/docker-compose.green.yml"
+PROXY_COMPOSE_FILE="deployment/docker/proxy/docker-compose.yml"
+
 ## make a copy of the latest docker-compose as green deployment
-cp deployment/docker/infrastructure/docker-compose.yml deployment/docker/infrastructure/docker-compose.green.yml
-sed -i 's/blue-network/green-network/g' deployment/docker/infrastructure/docker-compose.green.yml
+cp $BLUE_COMPOSE_FILE $GREEN_COMPOSE_FILE
+sed -i 's/blue-network/green-network/g' $GREEN_COMPOSE_FILE
 
 ## start the green deployment
-BLUE_COMPOSE="docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.yml"
-GREEN_COMPOSE="docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.green.yml"
+BLUE_COMPOSE="docker compose --env-file .env -f $BLUE_COMPOSE_FILE -p blue"
+GREEN_COMPOSE="docker compose --env-file .env -f $GREEN_COMPOSE_FILE -p green"
 
 $GREEN_COMPOSE up -d
 
@@ -32,8 +36,8 @@ check_health() {
 ## wait for the green deployment to be healthy
 echo "Checking health of services..."
 if check_health "$GREEN_COMPOSE"; then
-  sed -i 's/blue-network/green-network/g' deployment/docker/proxy/docker-compose.yml
-  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
+  sed -i 's/blue-network/green-network/g' $PROXY_COMPOSE_FILE
+  docker compose --env-file .env -f $PROXY_COMPOSE_FILE up -d
 else
   echo "Not all services became healthy within the time limit. for green deployment"
   exit 1
@@ -42,8 +46,8 @@ fi
 $BLUE_COMPOSE up -d
 
 if check_health "$BLUE_COMPOSE"; then
-  sed -i 's/green-network/blue-network/g' deployment/docker/proxy/docker-compose.yml
-  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
+  sed -i 's/green-network/blue-network/g' $PROXY_COMPOSE_FILE
+  docker compose --env-file .env -f $PROXY_COMPOSE_FILE up -d
   $GREEN_COMPOSE down
 else
   echo "Not all services became healthy within the time limit. for blue deployment"
