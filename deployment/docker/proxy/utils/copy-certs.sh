@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "Starting  copy script..."
+
 # Check if DOMAIN is set
 if [ -z "${DOMAIN}" ]; then
   echo "Error: DOMAIN is not set"
