@@ -13,7 +13,7 @@ cert_file="/caddy/certs/${domain}/${domain}.crt"
 key_file="/caddy/certs/${domain}/${domain}.key"
 
 # Path to the destination directory
-dest_dir="/tmp/emqx_certs"
+dest_dir="/caddy/emqx_certs"
 
 # Wait for the certificate and key files to exist
 while [ ! -f "$cert_file" ] || [ ! -f "$key_file" ]; do
