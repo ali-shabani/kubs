@@ -27,7 +27,7 @@ services:
     volumes:
       - certs:/caddy/certs
       - emqx_certs:/caddy/emqx_certs
-      - ./deployment/docker/proxy/utils:/utils
+      - ./utils:/utils
     command: ["sh", "/utils/copy_certs.sh"]
 
 volumes:
