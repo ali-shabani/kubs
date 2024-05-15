@@ -15,7 +15,19 @@ services:
       - pg-vol:/var/lib/postgresql/data
       - ./pg/init-db:/docker-entrypoint-initdb.d
     networks:
-      - infrastructure
+      - blue-network
+
+  db-migration:
+    image: arigaio/atlas:0.22.0
+    depends_on:
+      postgres:
+        condition: service_completed_successfully
+    volumes:
+      - ../../../db/migrations:/migrations:ro
+    command:
+      ["migrate", "apply", "--url", "$BUYNOW_DATABASE_URL?sslmode=disable"]
+    networks:
+      - blue-network
 
   redis:
     image: redis:7.2.4
@@ -28,7 +40,7 @@ services:
     volumes:
       - redis-vol:/usr/local/etc/redis
     networks:
-      - infrastructure
+      - blue-network
 
   hasura:
     image: hasura/graphql-engine:v2.38.1
@@ -52,7 +64,22 @@ services:
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
       HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
     networks:
-      - infrastructure
+      - blue-network
+
+  hasura-metadata-apply:
+    build:
+      context: .
+      dockerfile: ./hasura/Dockerfile
+    image: buynow/hasura-metadata-apply
+    environment:
+      HASURA_ADMIN_SECRET: $HASURA_ADMIN_SECRET
+    depends_on:
+      hasura:
+        condition: service_completed_successfully
+    volumes:
+      - ../../../hasura:/hasura
+    networks:
+      - blue-network
 
   emqx:
     image: emqx:5.6.1
@@ -77,14 +104,16 @@ services:
       - ./emqx/emqx.conf:/tmp/emqx.conf
       - emqx_certs:/etc/certs
     networks:
-      - infrastructure
+      - blue-network
 
 volumes:
   pg-vol:
+    external: true
   redis-vol:
+    external: true
   emqx_certs:
     external: true
 
 networks:
-  infrastructure:
+  blue-network:
     external: true

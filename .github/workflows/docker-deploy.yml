@@ -50,9 +50,4 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd app
-            docker volume create certs
-            docker volume create emqx_certs
-            docker network create infrastructure || true
-            docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.yml up -d
-            docker compose --env-file .env -f deployment/docker/jobs/docker-compose.yml up -d
-            docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
+            # sh ./deployment/docker/start.sh
