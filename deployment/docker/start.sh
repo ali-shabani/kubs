@@ -10,8 +10,8 @@ sed -i 's/blue-network/green-network/g' deployment/docker/infrastructure/docker-
 ## start the green deployment
 BLUE_COMPOSE="docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.yml"
 GREEN_COMPOSE="docker compose --env-file .env -f deployment/docker/infrastructure/docker-compose.green.yml"
+
 $GREEN_COMPOSE up -d
-# docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
 
 check_health() {
   COMPOSE_CMD=$1
@@ -33,7 +33,7 @@ check_health() {
 echo "Checking health of services..."
 if check_health "$GREEN_COMPOSE"; then
   sed -i 's/blue-network/green-network/g' deployment/docker/proxy/docker-compose.yml
-  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml
+  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
 else
   echo "Not all services became healthy within the time limit. for green deployment"
   exit 1
@@ -43,7 +43,7 @@ $BLUE_COMPOSE up -d
 
 if check_health "$BLUE_COMPOSE"; then
   sed -i 's/green-network/blue-network/g' deployment/docker/proxy/docker-compose.yml
-  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml
+  docker compose --env-file .env -f deployment/docker/proxy/docker-compose.yml up -d
   $GREEN_COMPOSE down
 else
   echo "Not all services became healthy within the time limit. for blue deployment"

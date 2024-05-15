@@ -21,7 +21,7 @@ services:
     image: arigaio/atlas:0.22.0
     depends_on:
       postgres:
-        condition: service_completed_successfully
+        condition: service_healthy
     volumes:
       - ../../../db/migrations:/migrations:ro
     command:
@@ -75,7 +75,7 @@ services:
       HASURA_ADMIN_SECRET: $HASURA_ADMIN_SECRET
     depends_on:
       hasura:
-        condition: service_completed_successfully
+        condition: service_healthy
     volumes:
       - ../../../hasura:/hasura
     networks:
