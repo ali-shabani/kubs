@@ -65,8 +65,8 @@ services:
     environment:
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: "/etc/certs/$MQTT_DOMAIN.key"
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: "/etc/certs/$MQTT_DOMAIN.key"
-      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.pem"
-      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.pem"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.crt"
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: "/etc/certs/$MQTT_DOMAIN.crt"
     command:
       - sh
       - -c

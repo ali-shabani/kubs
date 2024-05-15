@@ -28,7 +28,7 @@ services:
       - certs:/caddy/certs
       - emqx_certs:/caddy/emqx_certs
       - ./utils:/utils
-    command: ["sh", "/utils/copy_certs.sh"]
+    command: ["sh", "/utils/copy-certs.sh"]
 
 volumes:
   certs:
