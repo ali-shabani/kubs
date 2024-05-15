@@ -85,7 +85,7 @@ services:
     image: emqx:5.6.1
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "emqx_ctl status | grep 'is running'"]
+      test: ["CMD-SHELL", "emqx_ctl status | grep 'is started'"]
       interval: 30s
       timeout: 10s
       retries: 3
