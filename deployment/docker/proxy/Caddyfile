@@ -1,8 +1,8 @@
 {
     layer4 {
-				:8083 {
+				:8883 {
             proxy {
-                to emqx:8083
+                to emqx:8883
             }
         }
 				:8084 {
@@ -18,7 +18,7 @@ api.{$HOST} {
 }
 
 mqtt.{$HOST} {
-    
+
 }
 
 emqx.{$HOST} {
