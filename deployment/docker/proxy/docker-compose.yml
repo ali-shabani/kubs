@@ -18,7 +18,7 @@ services:
       - "8883:8883"
       - "8084:8084"
     networks:
-      - infrastructure
+      - blue-network
 
   middleware:
     image: alpine:3.19
@@ -39,5 +39,5 @@ volumes:
   caddy_config:
 
 networks:
-  infrastructure:
+  blue-network:
     external: true
