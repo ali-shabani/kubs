@@ -17,6 +17,7 @@ jobs:
 
       - name: apply dns records
         run: |
+          echo -n '${{ secrets.ARVAN_API_KEY }}' | base64 --decode
           curl -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
             -H "Content-Type: multipart/form-data" \
             -H "Authorization: $(echo -n '${{ secrets.ARVAN_API_KEY }}' | base64 --decode)" \
@@ -50,4 +51,4 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd app
-            # sh ./deployment/docker/start.sh
+            # bash ./deployment/docker/start.sh
