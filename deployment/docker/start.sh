@@ -14,7 +14,9 @@ sed -i 's/blue-network/green-network/g' $GREEN_COMPOSE_FILE
 ## start the green deployment
 BLUE_COMPOSE="docker compose --env-file .env -f $BLUE_COMPOSE_FILE -p blue"
 GREEN_COMPOSE="docker compose --env-file .env -f $GREEN_COMPOSE_FILE -p green"
+PROXY_COMPOSE="docker compose --env-file .env -f $PROXY_COMPOSE_FILE"
 
+$PROXY_COMPOSE up -d
 $GREEN_COMPOSE up -d
 
 check_health() {
@@ -36,8 +38,8 @@ check_health() {
 ## wait for the green deployment to be healthy
 echo "Checking health of services..."
 if check_health "$GREEN_COMPOSE"; then
-  sed -i 's/blue-network/green-network/g' $PROXY_COMPOSE_FILE
-  docker compose --env-file .env -f $PROXY_COMPOSE_FILE up -d
+  docker network disconnect blue-network proxy-caddy-1
+  docker network connect green-network proxy-caddy-1
 else
   echo "Not all services became healthy within the time limit. for green deployment"
   exit 1
@@ -46,8 +48,8 @@ fi
 $BLUE_COMPOSE up -d
 
 if check_health "$BLUE_COMPOSE"; then
-  sed -i 's/green-network/blue-network/g' $PROXY_COMPOSE_FILE
-  docker compose --env-file .env -f $PROXY_COMPOSE_FILE up -d
+  docker network disconnect green-network proxy-caddy-1
+  docker network connect blue-network proxy-caddy-1
   $GREEN_COMPOSE down
 else
   echo "Not all services became healthy within the time limit. for blue deployment"
