@@ -16,12 +16,10 @@ COPY ./crontab /etc/cron.d/crontab
 RUN chmod 0644 /etc/cron.d/crontab
 RUN chmod +x /entrypoint.sh
 
-# # Apply cron job
-# RUN crontab /etc/cron.d/crontab
+# Apply cron job
+RUN crontab /etc/cron.d/crontab
 
-# RUN touch /var/log/cron.log
+RUN touch /var/log/cron.log
 
-# # Run the command on container startup
-# CMD cron && tail -f /var/log/cron.log
-
-ENTRYPOINT ["/entrypoint.sh"]
+# Run the command on container startup
+CMD printenv >> /etc/environment && cron && tail -f /var/log/cron.log
