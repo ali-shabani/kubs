@@ -1,1 +1,1 @@
-* * * * * /entrypoint.sh >> /var/log/cron.log 2>&1
+* * * * * PATH=/usr/local/bin:$PATH /entrypoint.sh >> /var/log/cron.log 2>&1
