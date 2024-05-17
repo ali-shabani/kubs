@@ -12,6 +12,8 @@ services:
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - S3_BUCKET=$S3_BACKUP_BUCKET
       - AWS_ENDPOINT_URL=https://s3.ir-thr-at1.arvanstorage.ir
+    networks:
+      - blue-network
 
 networks:
   blue-network:
