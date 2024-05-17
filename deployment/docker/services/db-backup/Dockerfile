@@ -18,3 +18,5 @@ RUN chmod +x /entrypoint.sh
 
 # Apply cron job
 RUN crontab /etc/cron.d/crontab
+
+CMD ["tail", "-f", "/dev/null"]
