@@ -19,4 +19,7 @@ RUN chmod +x /entrypoint.sh
 # Apply cron job
 RUN crontab /etc/cron.d/crontab
 
-CMD ["tail", "-f", "/dev/null"]
+RUN touch /var/log/cron.log
+
+# Run the command on container startup
+CMD cron && tail -f /var/log/cron.log
