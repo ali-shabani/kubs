@@ -1,10 +1,12 @@
 FROM ubuntu:latest
 
 # Install necessary tools
-RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client cron
+RUN apt-get update && apt-get install -y curl unzip postgresql-client cron
 
 # Install AWS CLI
-RUN pip3 install awscli
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
 
 # Copy the script and the crontab file to the container
 COPY ./entrypoint.sh /entrypoint.sh
