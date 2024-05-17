@@ -3,7 +3,7 @@ services:
     image: buynow/db-backup
     build:
       context: ./db-backup
-      dockerfile: ./db-backup/Dockerfile
+      dockerfile: ./Dockerfile
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
