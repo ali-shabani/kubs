@@ -55,3 +55,6 @@ else
   echo "Not all services became healthy within the time limit. for blue deployment"
   exit 1
 fi
+
+
+docker compose --env-file .env -f deployment/docker/services/docker-compose.yml up -d
