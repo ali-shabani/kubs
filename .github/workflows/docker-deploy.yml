@@ -1,78 +1,68 @@
 name: docker deploy
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
 
 jobs:
-  test:
-    name: test
+  create_dns:
+    name: create dns records
     runs-on: ubuntu-latest
     environment: staging
     steps:
-      - name: echo ealish
-        run: echo ${{ vars.ALISH }}
-  # create_dns:
-  #   name: create dns records
-  #   runs-on: ubuntu-latest
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create zone file
+        run: |
+          echo "api 120 A ${{ vars.SERVER_IP }}" >> zonefile
+          echo "emqx 120 A ${{ vars.SERVER_IP }}" >> zonefile
+          echo "mqtt 120 A ${{ vars.SERVER_IP }}" >> zonefile
 
-  #   environment: staging
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Create zone file
-  #       run: |
-  #         echo "api 120 A ${{ vars.SERVER_IP }}" >> zonefile
-  #         echo "emqx 120 A ${{ vars.SERVER_IP }}" >> zonefile
-  #         echo "mqtt 120 A ${{ vars.SERVER_IP }}" >> zonefile
+      - name: apply dns records
+        run: |
+          curl -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
+            -H "Content-Type: multipart/form-data" \
+            -H "Authorization: $(echo -n '${{ secrets.ARVAN_API_KEY }}' | base64 --decode)" \
+            -F "f_zone_file=@zonefile"
 
-  #     - name: apply dns records
-  #       run: |
-  #         curl -X POST "https://napi.arvancloud.ir/cdn/4.0/domains/${{ vars.HOST }}/dns-records/import" \
-  #           -H "Content-Type: multipart/form-data" \
-  #           -H "Authorization: $(echo -n '${{ secrets.ARVAN_API_KEY }}' | base64 --decode)" \
-  #           -F "f_zone_file=@zonefile"
+  deploy:
+    name: ssh into server
+    runs-on: ubuntu-latest
+    needs: [create_dns]
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # deploy:
-  #   name: ssh into server
-  #   runs-on: ubuntu-latest
-  #   needs: [create_dns]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+      - name: Make envfile
+        run: |
+          echo "HOST=${{ vars.HOST }}" >> .env
+          echo "MQTT_DOMAIN=${{ vars.MQTT_DOMAIN }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "S3_BACKUP_BUCKET=${{ vars.S3_BACKUP_BUCKET }}" >> .env
+          echo "HASURA_ADMIN_SECRET=${{ secrets.HASURA_ADMIN_SECRET }}" >> .env
+          echo "BUYNOW_DATABASE_URL=postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/buynow" >> .env
 
-  #     - name: Make envfile
-  #       run: |
-  #         echo "HOST=${{ vars.HOST }}" >> .env
-  #         echo "MQTT_DOMAIN=${{ vars.MQTT_DOMAIN }}" >> .env
-  #         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-  #         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-  #         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-  #         echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
-  #         echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
-  #         echo "S3_BACKUP_BUCKET=${{ vars.S3_BACKUP_BUCKET }}" >> .env
-  #         echo "HASURA_ADMIN_SECRET=${{ secrets.HASURA_ADMIN_SECRET }}" >> .env
-  #         echo "BUYNOW_DATABASE_URL=postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/buynow" >> .env
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          overwrite: true
+          source: "db,deployment,hasura,.env"
+          target: app
 
-  #     - name: copy file via ssh password
-  #       uses: appleboy/scp-action@v0.1.7
-  #       with:
-  #         host: ${{ vars.SERVER_IP }}
-  #         username: ${{ secrets.SERVER_USERNAME }}
-  #         password: ${{ secrets.SERVER_PASSWORD }}
-  #         overwrite: true
-  #         source: "db,deployment,hasura,.env"
-  #         target: app
-
-  #     - name: executing remote ssh commands using password
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ vars.SERVER_IP }}
-  #         username: ${{ secrets.SERVER_USERNAME }}
-  #         password: ${{ secrets.SERVER_PASSWORD }}
-  #         script: |
-  #           cd app
-  #           # bash ./deployment/docker/start.sh
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd app
+            # bash ./deployment/docker/start.sh
