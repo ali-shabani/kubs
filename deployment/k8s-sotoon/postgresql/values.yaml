@@ -18,7 +18,7 @@ global:
 ## @param global.storageClass DEPRECATED: use global.defaultStorageClass instead
   ##
   defaultStorageClass: ""
-  storageClass: ""
+  storageClass: "sotoon-csi"
   ## Security parameters
   ##
   security:
@@ -35,7 +35,7 @@ global:
     ## @param global.postgresql.auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.replicationPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
     ##
     auth:
-      postgresPassword: ""
+      postgresPassword: "NP852Hvyu2nJ3Gt2"
       username: ""
       password: ""
       database: ""
@@ -484,7 +484,13 @@ primary:
   ##     cpu: 3
   ##     memory: 1024Mi
   ##
-  resources: {}
+  resources:
+    requests:
+      cpu: 1
+      memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 1024Mi
   ## Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ## @param primary.podSecurityContext.enabled Enable security context
@@ -657,7 +663,7 @@ primary:
   networkPolicy:
     ## @param primary.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param primary.networkPolicy.allowExternal Don't require server label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## server label will have network access to the ports server is listening
@@ -805,7 +811,7 @@ primary:
       - ReadWriteOnce
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
-    size: 8Gi
+    size: 2Gi
     ## @param primary.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
@@ -1111,7 +1117,7 @@ readReplicas:
   networkPolicy:
     ## @param readReplicas.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param readReplicas.networkPolicy.allowExternal Don't require server label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## server label will have network access to the ports server is listening
