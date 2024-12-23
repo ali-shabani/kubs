@@ -17,7 +17,7 @@ global:
   ##   - myRegistryKeySecretName
   ##
   imagePullSecrets: []
-  defaultStorageClass: ""
+  defaultStorageClass: "sotoon-csi"
   ## Security parameters
   ##
   security:
@@ -114,7 +114,7 @@ image:
 auth:
   enabled: true
   user: nats_client
-  password: ""
+  password: "z5hfe944J8i5SRnK"
   token: ""
   timeout: 1
   usersCredentials: []
@@ -137,7 +137,7 @@ cluster:
   auth:
     enabled: true
     user: nats_cluster
-    password: ""
+    password: "3ffJM99fVZGWQ547"
 ## JetStream Configuration
 ## ref: https://docs.nats.io/running-a-nats-service/configuration/resource_management
 ## @param jetstream.enabled Switch to enable/disable JetStream
@@ -732,7 +732,7 @@ ingress:
 networkPolicy:
   ## @param networkPolicy.enabled Enable creation of NetworkPolicy resources
   ##
-  enabled: true
+  enabled: false
   ## @param networkPolicy.allowExternal The Policy model to apply
   ## When set to false, only pods with the correct client label will have network access to the ports NATS is
   ## listening on. When true, NATS will accept connections from any source (with the correct destination port).
@@ -926,7 +926,7 @@ metrics:
 persistence:
   ## @param persistence.enabled Enable NATS data persistence using PVC(s)
   ##
-  enabled: false
+  enabled: true
   ## @param persistence.storageClass PVC Storage Class for NATS data volume
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -940,7 +940,7 @@ persistence:
     - ReadWriteOnce
   ## @param persistence.size PVC Storage Request for NATS data volume
   ##
-  size: 8Gi
+  size: 2Gi
   ## @param persistence.annotations Annotations for the PVC
   ##
   annotations: {}
